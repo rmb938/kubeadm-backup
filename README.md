@@ -22,8 +22,8 @@ TODO
 ## TODO
 
 * Support other blob storage backends
-    -[X] GCS
-    -[X] S3
-    -[ ] Azure
-    -[ ] Other blob storage?
--[X] Delete old backups
+    - [X] GCS
+    - [X] S3
+    - [ ] Azure
+    - [ ] Other blob storage?
+- [X] Delete old backups
