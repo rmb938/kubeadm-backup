@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubeadm-backup
+  labels:
+    app: kubeadm-backup
+spec:
+  selector:
+    matchLabels:
+      app: kubeadm-backup
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kubeadm-backup
+    spec:
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+      volumes:
+        - name: kubeadm-pki
+          hostPath:
+            path: /etc/kubernetes/pki
+            type: Directory
+        - name: blob-config
+          secret:
+            secretName: kubeadm-backup-blob-config
+      containers:
+        - name: kubeadm-backup
+          image: kubeadm-backup:latest
+          args:
+            - --etcd-endpoint=https://$(NODE_IP):2379
+            - --etcd-ca-file=/host/etc/kubernetes/pki/etcd/ca.crt
+            - --etcd-key-file=/host/etc/kubernetes/pki/etcd/healthcheck-client.key
+            - --etcd-certificate-file=/host/etc/kubernetes/pki/etcd/healthcheck-client.crt
+            - --kubeadm-pki-directory=/host/etc/kubernetes/pki
+            - --blob-config-file=/blob/config.yaml
+            - --backup-interval=1h
+            - --backup-ttl=720h
+          env:
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+          volumeMounts:
+            - name: kubeadm-pki
+              mountPath: /host/etc/kubernetes/pki
+            - name: blob-config
+              mountPath: /blob
