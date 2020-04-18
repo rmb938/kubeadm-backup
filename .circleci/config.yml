@@ -48,7 +48,7 @@ jobs:
           name: Load Docker Images
           command: |
             docker load -i /tmp/workspace/images/amd64.tar
-            docker load -i /tmp/workspace/images/armv7.ta
+            docker load -i /tmp/workspace/images/armv7.tar
       - run:
           name: Push Docker Images
           command: |
