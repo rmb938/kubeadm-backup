@@ -65,10 +65,13 @@ workflows:
           filters:
             tags:
               only: /.*/
+            branches:
+              only: /.*/
       - publish-image:
           requires:
             - build
-            - publish-image
           filters:
             tags:
               only: /^v.*/
+            branches:
+              only: master
