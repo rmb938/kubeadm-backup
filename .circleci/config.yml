@@ -60,7 +60,7 @@ jobs:
             make docker-push DOCKER_REPO=docker.io/rmb938 DOCKER_IMAGE_NAME=kubeadm-backup DOCKER_IMAGE_TAG=${DOCKER_TAG}
             make docker-manifest DOCKER_REPO=docker.io/rmb938 DOCKER_IMAGE_NAME=kubeadm-backup DOCKER_IMAGE_TAG=${DOCKER_TAG}
             if [ -n "$CIRCLE_TAG" ]; then
-              make docker-latest DOCKER_REPO=docker.io/rmb938 DOCKER_IMAGE_NAME=kubeadm-backup
+              make docker-latest DOCKER_REPO=docker.io/rmb938 DOCKER_IMAGE_NAME=kubeadm-backup DOCKER_IMAGE_TAG=${DOCKER_TAG}
               make docker-push-latest DOCKER_REPO=docker.io/rmb938 DOCKER_IMAGE_NAME=kubeadm-backup
               make docker-manifest-latest DOCKER_REPO=docker.io/rmb938 DOCKER_IMAGE_NAME=kubeadm-backup
             fi
