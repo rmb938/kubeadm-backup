@@ -1,0 +1,11 @@
+resources:
+  - ../base
+  - secret.yaml
+
+commonLabels:
+  env: kubeadm
+
+images:
+  - name: kubeadm-backup
+    newName: docker.io/rmb938/kubeadm-backup
+    newTag: latest
