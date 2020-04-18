@@ -56,7 +56,7 @@ jobs:
             if [ -n "$CIRCLE_TAG" ]; then
               DOCKER_TAG=$CIRCLE_TAG
             fi
-            echo $DOCKER_PASSWORD | docker login docker.pkg.github.com -u rmb938 --password-stdin
+            echo $DOCKER_PASSWORD | docker login -u rmb938 --password-stdin
             make docker-push DOCKER_REPO=docker.io/rmb938 DOCKER_IMAGE_NAME=kubeadm-backup DOCKER_IMAGE_TAG=${DOCKER_TAG}
             make docker-manifest DOCKER_REPO=docker.io/rmb938 DOCKER_IMAGE_NAME=kubeadm-backup DOCKER_IMAGE_TAG=${DOCKER_TAG}
 
