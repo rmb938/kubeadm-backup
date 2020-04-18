@@ -1,60 +1,58 @@
 version: 2
-  jobs:
-
-
-    build:
-      docker:
-        - image: debian:buster
-      steps:
-        - checkout
-        - run:
-            name: Create workspace
-            command: mkdir -p /workspace/images
-        - run:
-            name: Build binary
-            command: make build
-        - setup_remote_docker
-        - run:
-            name: Build Docker Images
-            command: |
-              DOCKER_TAG="master"
-              if [ -n "$CIRCLE_TAG" ]; then
-                DOCKER_TAG=$CIRCLE_TAG
-              fi
-              make docker DOCKER_REPO=docker.io/rmb938 DOCKER_IMAGE_NAME=kubeadm-backup DOCKER_IMAGE_TAG=${DOCKER_TAG}
-        - run:
-            name: Save Docker Images
-            command: |
-              DOCKER_TAG="master"
-              if [ -n "$CIRCLE_TAG" ]; then
-                DOCKER_TAG=$CIRCLE_TAG
-              fi
-              docker save -o /workspace/image/amd64.tar docker.io/rmb938/kubeadm-backup:${DOCKER_TAG}-amd64
-              docker save -o /workspace/image/armv7.tar docker.io/rmb938/kubeadm-backup:${DOCKER_TAG}-armv7
-        - persist_to_workspace:
-            root: /workspace
-            paths: images
-
-    publish-image:
+jobs:
+  build:
+    docker:
+      - image: debian:buster
+    steps:
       - checkout
+      - run:
+          name: Create workspace
+          command: mkdir -p /workspace/images
+      - run:
+          name: Build binary
+          command: make build
       - setup_remote_docker
-      - attach_workspace:
-          at: /workspace
       - run:
-          name: Load Docker Images
-          command: |
-            docker load -i /workspace/image/amd64.tar
-            docker load -i /workspace/image/armv7.ta
-      - run:
-          name: Push Docker Images
+          name: Build Docker Images
           command: |
             DOCKER_TAG="master"
             if [ -n "$CIRCLE_TAG" ]; then
               DOCKER_TAG=$CIRCLE_TAG
             fi
-            echo $DOCKER_PASSWORD | docker login docker.pkg.github.com -u rmb938 --password-stdin
-            make docker-push DOCKER_REPO=docker.io/rmb938 DOCKER_IMAGE_NAME=kubeadm-backup DOCKER_IMAGE_TAG=${DOCKER_TAG}
-            make docker-manifest DOCKER_REPO=docker.io/rmb938 DOCKER_IMAGE_NAME=kubeadm-backup DOCKER_IMAGE_TAG=${DOCKER_TAG}
+            make docker DOCKER_REPO=docker.io/rmb938 DOCKER_IMAGE_NAME=kubeadm-backup DOCKER_IMAGE_TAG=${DOCKER_TAG}
+      - run:
+          name: Save Docker Images
+          command: |
+            DOCKER_TAG="master"
+            if [ -n "$CIRCLE_TAG" ]; then
+              DOCKER_TAG=$CIRCLE_TAG
+            fi
+            docker save -o /workspace/image/amd64.tar docker.io/rmb938/kubeadm-backup:${DOCKER_TAG}-amd64
+            docker save -o /workspace/image/armv7.tar docker.io/rmb938/kubeadm-backup:${DOCKER_TAG}-armv7
+      - persist_to_workspace:
+          root: /workspace
+          paths: images
+
+  publish-image:
+    - checkout
+    - setup_remote_docker
+    - attach_workspace:
+        at: /workspace
+    - run:
+        name: Load Docker Images
+        command: |
+          docker load -i /workspace/image/amd64.tar
+          docker load -i /workspace/image/armv7.ta
+    - run:
+        name: Push Docker Images
+        command: |
+          DOCKER_TAG="master"
+          if [ -n "$CIRCLE_TAG" ]; then
+            DOCKER_TAG=$CIRCLE_TAG
+          fi
+          echo $DOCKER_PASSWORD | docker login docker.pkg.github.com -u rmb938 --password-stdin
+          make docker-push DOCKER_REPO=docker.io/rmb938 DOCKER_IMAGE_NAME=kubeadm-backup DOCKER_IMAGE_TAG=${DOCKER_TAG}
+          make docker-manifest DOCKER_REPO=docker.io/rmb938 DOCKER_IMAGE_NAME=kubeadm-backup DOCKER_IMAGE_TAG=${DOCKER_TAG}
 
 workflows:
   version: 2
