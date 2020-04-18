@@ -7,7 +7,7 @@ jobs:
       - checkout
       - run:
           name: Create workspace
-          command: mkdir -p /workspace/images
+          command: mkdir -p images
       - run:
           name: Build binary
           command: make build
@@ -27,10 +27,10 @@ jobs:
             if [ -n "$CIRCLE_TAG" ]; then
               DOCKER_TAG=$CIRCLE_TAG
             fi
-            docker save -o /workspace/image/amd64.tar docker.io/rmb938/kubeadm-backup:${DOCKER_TAG}-amd64
-            docker save -o /workspace/image/armv7.tar docker.io/rmb938/kubeadm-backup:${DOCKER_TAG}-armv7
+            docker save -o images/amd64.tar docker.io/rmb938/kubeadm-backup:${DOCKER_TAG}-amd64
+            docker save -o images/armv7.tar docker.io/rmb938/kubeadm-backup:${DOCKER_TAG}-armv7
       - persist_to_workspace:
-          root: /workspace
+          root: .
           paths: images
 
   publish-image:
@@ -44,8 +44,8 @@ jobs:
       - run:
           name: Load Docker Images
           command: |
-            docker load -i /workspace/image/amd64.tar
-            docker load -i /workspace/image/armv7.ta
+            docker load -i /workspace/images/amd64.tar
+            docker load -i /workspace/images/armv7.ta
       - run:
           name: Push Docker Images
           command: |
