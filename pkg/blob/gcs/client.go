@@ -95,11 +95,10 @@ func (bc *blobClient) Read(ctx context.Context, objectName string) (io.Reader, e
 
 func (bc *blobClient) List(ctx context.Context) <-chan interface{} {
 	objectNamesChan := make(chan interface{}, 1)
-	defer close(objectNamesChan)
-
 	bkt := bc.gcsClient.Bucket(bc.config.Bucket)
 
 	go func(ctx context.Context, bkt *storage.BucketHandle, objectNamesChan chan<- interface{}) {
+		defer close(objectNamesChan)
 		it := bkt.Objects(ctx, nil)
 		for {
 			attrs, err := it.Next()
