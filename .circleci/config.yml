@@ -68,7 +68,7 @@ workflows:
       - publish-image:
           requires:
             - build
-            - publish
+            - publish-image
           filters:
             tags:
               only: /^v.*/
