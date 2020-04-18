@@ -32,6 +32,6 @@ docker-push-latest:
 	docker push "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):latest-armv7"
 
 docker-manifest-latest:
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create -a "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):latest" "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):latest-amd64" "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):latestarmv7"
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create -a "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):latest" "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):latest-amd64" "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):latest-armv7"
 	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate --arch arm "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):latest" "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):latest-armv7"
 	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):latest"
