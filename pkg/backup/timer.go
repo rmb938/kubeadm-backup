@@ -2,7 +2,6 @@ package backup
 
 import (
 	"context"
-	"os"
 	"time"
 
 	"github.com/pkg/errors"
@@ -43,25 +42,13 @@ func (bt *backupTimer) Run() {
 	ticker := time.NewTicker(bt.interval)
 	defer ticker.Stop()
 
-	if err := bt.cleanBackups(); err != nil {
-		bt.log.Error(err, "error cleaning backups")
-		os.Exit(1) // failed to take the first backup so just exist
-	}
-
-	if err := bt.doBackup(); err != nil {
-		bt.log.Error(err, "error taking backup")
-		os.Exit(1) // failed to take the first backup so just exist
-	}
-
-	for {
-		select {
-		case <-ticker.C:
-			if err := bt.cleanBackups(); err != nil {
-				bt.log.Error(err, "error cleaning backups")
-			}
-			if err := bt.doBackup(); err != nil {
-				bt.log.Error(err, "error taking backup")
-			}
+	// this makes it tick once and then on interval
+	for ; true; <-ticker.C {
+		if err := bt.cleanBackups(); err != nil {
+			bt.log.Error(err, "error cleaning backups")
+		}
+		if err := bt.doBackup(); err != nil {
+			bt.log.Error(err, "error taking backup")
 		}
 	}
 }
