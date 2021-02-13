@@ -99,7 +99,7 @@ config:
 
 #### S3
 
-Kubeadm Backup uses the [minio client](https://github.com/minio/minio-go) library to upload Prometheus data into AWS S3.
+Kubeadm Backup uses the [minio client](https://github.com/minio/minio-go) library to backups to S3.
 
 ```yaml
 type: S3
