@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rmb938/kubeadm-backup/pkg/metrics"
 	"os"
 	"time"
@@ -16,28 +15,6 @@ import (
 	"github.com/rmb938/kubeadm-backup/pkg/blob"
 	"github.com/rmb938/kubeadm-backup/pkg/etcd"
 )
-
-var (
-	LastSuccessfulBackupTime = prometheus.NewGauge(
-		prometheus.GaugeOpts{
-			Name: "etcd_last_successful_backup_time",
-			Help: "When the last backup was successfully run. Expressed as a Unix Epoch Time.",
-		},
-	)
-	// BackupSuccess is a prometheus metric which is a Gauge of
-	BackupSuccess = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "etcd_backup_success",
-		Help: "etcd backup success",
-	},
-	)
-)
-
-func init() {
-	metrics.Registry.MustRegister(
-		BackupSuccess,
-		LastSuccessfulBackupTime,
-	)
-}
 
 func main() {
 	logLevel := flag.Int("v", 0, "number for the log level verbosity")

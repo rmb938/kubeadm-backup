@@ -10,6 +10,9 @@ build-amd64:
 build-armv7:
 	CGO_ENABLED=0 GOOS=linux GOARCH=arm GO111MODULE=on go build -ldflags '-extldflags "-static"' -o bin/kubeadm-backup-linux-armv7 cmd/kubeadm-backup/main.go
 
+tilt:
+	KUBECONFIG=~/.kube/config tilt up --hud=true --legacy
+
 docker:
 	docker build -t "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)-amd64" --build-arg ARCH="amd64" --build-arg OS="linux" .
 	docker build -t "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)-armv7" --build-arg ARCH="armv7" --build-arg OS="linux" .
