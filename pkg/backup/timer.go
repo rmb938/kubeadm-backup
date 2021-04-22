@@ -2,6 +2,8 @@ package backup
 
 import (
 	"context"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/rmb938/kubeadm-backup/pkg/metrics"
 	"time"
 
 	"github.com/pkg/errors"
@@ -11,6 +13,28 @@ import (
 	"github.com/rmb938/kubeadm-backup/pkg/blob"
 	"github.com/rmb938/kubeadm-backup/pkg/etcd"
 )
+
+var (
+	LastSuccessfulBackupTime = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Name: "kubeadm_backup_last_successful_backup_time",
+			Help: "When the last backup was successfully run. Expressed as a Unix Epoch Time.",
+		},
+	)
+	// BackupSuccess is a prometheus metric which is a Gauge of
+	BackupSuccess = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "kubeadm_backup_success",
+		Help: "kubeadm backup success",
+	},
+	)
+)
+
+func init() {
+	metrics.Registry.MustRegister(
+		BackupSuccess,
+		LastSuccessfulBackupTime,
+	)
+}
 
 type backupTimer struct {
 	blobClient blob.BlobClient
@@ -47,8 +71,13 @@ func (bt *backupTimer) Run() {
 		if err := bt.cleanBackups(); err != nil {
 			bt.log.Error(err, "error cleaning backups")
 		}
+
 		if err := bt.doBackup(); err != nil {
 			bt.log.Error(err, "error taking backup")
+			BackupSuccess.Set(0)
+		} else {
+			BackupSuccess.Set(1)
+			LastSuccessfulBackupTime.SetToCurrentTime()
 		}
 	}
 }

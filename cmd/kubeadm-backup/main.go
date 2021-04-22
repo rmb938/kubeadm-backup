@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/rmb938/kubeadm-backup/pkg/metrics"
 	"os"
 	"time"
 
@@ -64,6 +65,9 @@ func main() {
 		setupLog.Error(fmt.Errorf("both etcd-key-file and etcd-certificate-file must be given"), "invalid command flags")
 		os.Exit(1)
 	}
+
+	metrics.Log = logr.WithName("metrics")
+	go metrics.ServeMetrics()
 
 	setupLog.Info("Creating Blob Client")
 	blobClient, err := blob.CreateBlobClientFromConfig(*blobConfigFile)
