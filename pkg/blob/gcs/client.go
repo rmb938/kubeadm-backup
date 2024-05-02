@@ -7,7 +7,6 @@ import (
 	"runtime"
 
 	"cloud.google.com/go/storage"
-	"github.com/pkg/errors"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
@@ -30,24 +29,24 @@ func NewBlobClient(ctx context.Context, rawConfig []byte) (*blobClient, error) {
 	config := &blobStorageConfig{}
 	err := yaml.Unmarshal(rawConfig, config)
 	if err != nil {
-		return nil, errors.Wrap(err, "error parsing gcs blob storage config")
+		return nil, fmt.Errorf("error parsing gcs blob storage config: %w", err)
 	}
 
 	if config.Bucket == "" {
-		return nil, errors.New("missing gcs bucket name in blob storage config")
+		return nil, fmt.Errorf("missing gcs bucket name in blob storage config: %w", err)
 	}
 
 	if len(config.ServiceAccount) > 0 {
 		credentials, err := google.CredentialsFromJSON(ctx, []byte(config.ServiceAccount), storage.ScopeFullControl)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to create credentials from JSON")
+			return nil, fmt.Errorf("failed to create credentials from JSON: %w", err)
 		}
 
 		opts = append(opts, option.WithCredentials(credentials))
 	} else {
 		credentials, err := google.FindDefaultCredentials(ctx, storage.ScopeFullControl)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to find default credentials")
+			return nil, fmt.Errorf("failed to find default credentials: %w", err)
 		}
 
 		opts = append(opts, option.WithCredentials(credentials))
@@ -58,7 +57,7 @@ func NewBlobClient(ctx context.Context, rawConfig []byte) (*blobClient, error) {
 
 	gcsClient, err := storage.NewClient(context.Background(), opts...)
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating gcs client")
+		return nil, fmt.Errorf("error creating gcs client: %w", err)
 	}
 
 	bc := &blobClient{
@@ -75,12 +74,12 @@ func (bc *blobClient) Create(ctx context.Context, objectName string, reader io.R
 
 	_, err := io.Copy(objWriter, reader)
 	if err != nil {
-		return errors.Wrapf(err, "error writing object %s to bucket %s", objectName, bc.config.Bucket)
+		return fmt.Errorf("error writing object %s to bucket %s: %w", objectName, bc.config.Bucket, err)
 	}
 
 	err = objWriter.Close()
 	if err != nil {
-		return errors.Wrapf(err, "error closing object writer")
+		return fmt.Errorf("error closing object writer: %w", err)
 	}
 
 	return nil

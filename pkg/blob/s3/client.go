@@ -12,7 +12,6 @@ import (
 
 	"github.com/minio/minio-go/v6"
 	"github.com/minio/minio-go/v6/pkg/credentials"
-	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )
 
@@ -48,7 +47,7 @@ func NewBlobClient(rawConfig []byte) (*blobClient, error) {
 	config := &defaultConfig
 	err := yaml.Unmarshal(rawConfig, config)
 	if err != nil {
-		return nil, errors.Wrap(err, "error parsing s3 blob storage config")
+		return nil, fmt.Errorf("error parsing s3 blob storage config: %w", err)
 	}
 
 	var chain []credentials.Provider
@@ -75,7 +74,7 @@ func NewBlobClient(rawConfig []byte) (*blobClient, error) {
 
 	minioClient, err := minio.NewWithCredentials(config.Endpoint, credentials.NewChainCredentials(chain), !config.Insecure, "")
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating s3 client")
+		return nil, fmt.Errorf("error creating s3 client: %w", err)
 	}
 
 	minioClient.SetAppInfo("kube-baremetal", fmt.Sprintf("%s (%s)", "0.0.1", runtime.Version()))

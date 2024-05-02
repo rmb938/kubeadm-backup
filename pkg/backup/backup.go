@@ -11,8 +11,6 @@ import (
 	"path"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/rmb938/kubeadm-backup/pkg/blob"
 	"github.com/rmb938/kubeadm-backup/pkg/etcd"
 )
@@ -42,7 +40,7 @@ func (b *backup) Take() error {
 	defer syncCTXCancel()
 	err := b.etcdClient.Sync(syncCTX)
 	if err != nil {
-		return errors.Wrap(err, "error syncing etcd endpoints")
+		return fmt.Errorf("error syncing etcd endpoints: %w", err)
 	}
 
 	// take etcd snapshot
@@ -50,13 +48,13 @@ func (b *backup) Take() error {
 	defer snapshotCTXCancel()
 	snapshotReader, err := b.etcdClient.Snapshot(snapshotCTX)
 	if err != nil {
-		return errors.Wrap(err, "error trying to snapshot etcd")
+		return fmt.Errorf("error trying to snapshot etcd: %w", err)
 	}
 	defer snapshotReader.Close()
 	// write snapshot to buffer, tar header needs a size
 	snapshotBytesBuff := &bytes.Buffer{}
 	if _, err := io.Copy(snapshotBytesBuff, snapshotReader); err != nil {
-		return errors.Wrap(err, "error copying etcd snapshot data to a buffer")
+		return fmt.Errorf("error copying etcd snapshot data to a buffer: %w", err)
 	}
 
 	// create backup buff, gzip and tar writers
@@ -73,10 +71,10 @@ func (b *backup) Take() error {
 	}
 	err = tarWriter.WriteHeader(snapshotHdr)
 	if err != nil {
-		return errors.Wrap(err, "error writing etcd snapshot header to tar")
+		return fmt.Errorf("error writing etcd snapshot header to tar: %w", err)
 	}
 	if _, err = io.Copy(tarWriter, snapshotBytesBuff); err != nil {
-		return errors.Wrap(err, "error writing etcd snapshot data to tar")
+		return fmt.Errorf("error writing etcd snapshot data to tar: %w", err)
 	}
 
 	// backup pki
@@ -84,12 +82,12 @@ func (b *backup) Take() error {
 		pkiFilePath := path.Join(b.kubeadmPKIDirectory, pkiFile)
 		f, err := os.Open(pkiFilePath)
 		if err != nil {
-			return errors.Wrapf(err, "error opening pki file %s", pkiFilePath)
+			return fmt.Errorf("error opening pki file %s: %w", pkiFilePath, err)
 		}
 
 		stat, err := f.Stat()
 		if err != nil {
-			return errors.Wrapf(err, "error stat pki file %s", pkiFilePath)
+			return fmt.Errorf("error stat pki file %s: %w", pkiFilePath, err)
 		}
 
 		pkiFileHeader := &tar.Header{
@@ -101,23 +99,23 @@ func (b *backup) Take() error {
 
 		err = tarWriter.WriteHeader(pkiFileHeader)
 		if err != nil {
-			return errors.Wrapf(err, "error writing pki file %s header to tar", pkiFile)
+			return fmt.Errorf("error writing pki file %s header to tar %w", pkiFile, err)
 		}
 
 		if _, err = io.Copy(tarWriter, f); err != nil {
-			return errors.Wrapf(err, "error writing pki file %s to tar", pkiFile)
+			return fmt.Errorf("error writing pki file %s to tar: %w", pkiFile, err)
 		}
 	}
 
 	// close everything
 	err = tarWriter.Close()
 	if err != nil {
-		return errors.Wrap(err, "error closing tar")
+		return fmt.Errorf("error closing tar: %w", err)
 	}
 
 	err = gzipWriter.Close()
 	if err != nil {
-		return errors.Wrap(err, "error closing gzip")
+		return fmt.Errorf("error closing gzip: %w", err)
 	}
 
 	// create backup
