@@ -2,10 +2,10 @@ package blob
 
 import (
 	"context"
-	"io/ioutil"
+	"fmt"
+	"os"
 	"strings"
 
-	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
 	"github.com/rmb938/kubeadm-backup/pkg/blob/gcs"
@@ -27,19 +27,19 @@ type BlobStorageConfig struct {
 func CreateBlobClientFromConfig(configFilePath string) (BlobClient, error) {
 	blobStorageConfig := &BlobStorageConfig{}
 
-	rawConfig, err := ioutil.ReadFile(configFilePath)
+	rawConfig, err := os.ReadFile(configFilePath)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error reading blob storage config file %s", configFilePath)
+		return nil, fmt.Errorf("error reading blob storage config file %s: %w", configFilePath, err)
 	}
 
 	err = yaml.UnmarshalStrict(rawConfig, blobStorageConfig)
 	if err != nil {
-		return nil, errors.Wrap(err, "error unmarshaling blob storage config")
+		return nil, fmt.Errorf("error unmarshaling blob storage config: %w", err)
 	}
 
 	config, err := yaml.Marshal(blobStorageConfig.Config)
 	if err != nil {
-		return nil, errors.Wrap(err, "error marshaling content of blob storage config")
+		return nil, fmt.Errorf("error marshaling content of blob storage config: %w", err)
 	}
 
 	var client BlobClient
@@ -49,11 +49,11 @@ func CreateBlobClientFromConfig(configFilePath string) (BlobClient, error) {
 	case string(S3):
 		client, err = s3.NewBlobClient(config)
 	default:
-		return nil, errors.Errorf("blob storage config with type %s not supported", blobStorageConfig.Type)
+		return nil, fmt.Errorf("blob storage config with type %s not supported: %w", blobStorageConfig.Type, err)
 	}
 
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to create blob client %s", blobStorageConfig.Type)
+		return nil, fmt.Errorf("failed to create blob client %s: %w", blobStorageConfig.Type, err)
 	}
 
 	return client, nil

@@ -6,10 +6,9 @@ import (
 	"crypto/x509"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"os"
 
-	"github.com/pkg/errors"
-	"go.etcd.io/etcd/clientv3"
+	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
 type Client struct {
@@ -19,7 +18,7 @@ type Client struct {
 func NewEtcdClient(endpoint, caFile, keyFile, certFile string) (*Client, error) {
 	tlsConfig, err := loadCertificates(caFile, keyFile, certFile)
 	if err != nil {
-		return nil, errors.Wrap(err, "error loading etcd certificates")
+		return nil, fmt.Errorf("error loading etcd certificates: %w", err)
 	}
 
 	clientv3Client, err := clientv3.New(clientv3.Config{
@@ -27,7 +26,7 @@ func NewEtcdClient(endpoint, caFile, keyFile, certFile string) (*Client, error) 
 		TLS:       tlsConfig,
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating etcd client")
+		return nil, fmt.Errorf("error creating etcd client: %w", err)
 	}
 
 	client := &Client{
@@ -40,7 +39,7 @@ func loadCertificates(caFile, keyFile, certFile string) (*tls.Config, error) {
 	cfg := &tls.Config{}
 
 	if caFile != "" {
-		caPEM, err := ioutil.ReadFile(caFile)
+		caPEM, err := os.ReadFile(caFile)
 		if err != nil {
 			return nil, err
 		}
@@ -48,7 +47,7 @@ func loadCertificates(caFile, keyFile, certFile string) (*tls.Config, error) {
 		certPool := x509.NewCertPool()
 		ok := certPool.AppendCertsFromPEM(caPEM)
 		if !ok {
-			return nil, fmt.Errorf("failed to add etcd ca certificate")
+			return nil, fmt.Errorf("failed to add etcd ca certificate: %w", err)
 		}
 
 		cfg.RootCAs = certPool

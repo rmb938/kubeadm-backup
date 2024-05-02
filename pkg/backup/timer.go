@@ -2,11 +2,11 @@ package backup
 
 import (
 	"context"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/rmb938/kubeadm-backup/pkg/metrics"
+	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/rmb938/kubeadm-backup/pkg/metrics"
 
 	"github.com/go-logr/logr"
 
@@ -113,7 +113,7 @@ func (bt *backupTimer) cleanBackups() error {
 
 			objectTime, err := time.Parse(time.RFC3339Nano, objectName[7:len(objectName)-7])
 			if err != nil {
-				return errors.Wrapf(err, "error parsing backup time for object %s", objectName)
+				return fmt.Errorf("error parsing backup time for object %s: %w", objectName, err)
 			}
 
 			now := time.Now()
@@ -125,13 +125,13 @@ func (bt *backupTimer) cleanBackups() error {
 				defer deleteCancel()
 				err = bt.blobClient.Delete(deleteCTX, objectName)
 				if err != nil {
-					return errors.Wrapf(err, "error deleting old backup taken at %v", objectTime.Format(time.RFC3339Nano))
+					return fmt.Errorf("error deleting old backup taken at %v: %w", objectTime.Format(time.RFC3339Nano), err)
 				}
 
 				bt.log.Info("Deleted old backup", "backup-time", objectTime.Format(time.RFC3339Nano))
 			}
 		default:
-			return errors.Errorf("Unknown type from objects channel: %T", objInterface)
+			return fmt.Errorf("Unknown type from objects channel: %T", objInterface)
 		}
 	}
 
