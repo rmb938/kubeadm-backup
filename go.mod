@@ -10,7 +10,7 @@ require (
 	github.com/prometheus/client_golang v1.19.0
 	go.etcd.io/etcd/client/v3 v3.5.13
 	go.uber.org/zap v1.27.0
-	golang.org/x/oauth2 v0.19.0
+	golang.org/x/oauth2 v0.20.0
 	google.golang.org/api v0.177.0
 	gopkg.in/yaml.v2 v2.4.0
 )
