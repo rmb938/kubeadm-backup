@@ -4,7 +4,7 @@ go 1.22
 
 require (
 	cloud.google.com/go/storage v1.41.0
-	github.com/go-logr/logr v1.4.1
+	github.com/go-logr/logr v1.4.2
 	github.com/go-logr/zapr v1.3.0
 	github.com/minio/minio-go/v6 v6.0.57
 	github.com/prometheus/client_golang v1.19.1
