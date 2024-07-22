@@ -8,7 +8,7 @@ require (
 	github.com/go-logr/zapr v1.3.0
 	github.com/minio/minio-go/v6 v6.0.57
 	github.com/prometheus/client_golang v1.19.1
-	go.etcd.io/etcd/client/v3 v3.5.14
+	go.etcd.io/etcd/client/v3 v3.5.15
 	go.uber.org/zap v1.27.0
 	golang.org/x/oauth2 v0.21.0
 	google.golang.org/api v0.188.0
@@ -44,8 +44,8 @@ require (
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.53.0 // indirect
 	github.com/prometheus/procfs v0.14.0 // indirect
-	go.etcd.io/etcd/api/v3 v3.5.14 // indirect
-	go.etcd.io/etcd/client/pkg/v3 v3.5.14 // indirect
+	go.etcd.io/etcd/api/v3 v3.5.15 // indirect
+	go.etcd.io/etcd/client/pkg/v3 v3.5.15 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.51.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.51.0 // indirect
