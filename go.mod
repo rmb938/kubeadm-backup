@@ -3,7 +3,7 @@ module github.com/rmb938/kubeadm-backup
 go 1.22
 
 require (
-	cloud.google.com/go/storage v1.44.0
+	cloud.google.com/go/storage v1.45.0
 	github.com/go-logr/logr v1.4.2
 	github.com/go-logr/zapr v1.3.0
 	github.com/minio/minio-go/v6 v6.0.57
