@@ -7,7 +7,7 @@ require (
 	github.com/go-logr/logr v1.4.2
 	github.com/go-logr/zapr v1.3.0
 	github.com/minio/minio-go/v6 v6.0.57
-	github.com/prometheus/client_golang v1.20.4
+	github.com/prometheus/client_golang v1.20.5
 	go.etcd.io/etcd/client/v3 v3.5.17
 	go.uber.org/zap v1.27.0
 	golang.org/x/oauth2 v0.24.0
