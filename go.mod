@@ -1,6 +1,7 @@
 module github.com/rmb938/kubeadm-backup
 
 go 1.22
+toolchain go1.23.7
 
 require (
 	cloud.google.com/go/storage v1.48.0
@@ -10,7 +11,7 @@ require (
 	github.com/prometheus/client_golang v1.20.5
 	go.etcd.io/etcd/client/v3 v3.5.17
 	go.uber.org/zap v1.27.0
-	golang.org/x/oauth2 v0.24.0
+	golang.org/x/oauth2 v0.28.0
 	google.golang.org/api v0.210.0
 	gopkg.in/yaml.v2 v2.4.0
 )
